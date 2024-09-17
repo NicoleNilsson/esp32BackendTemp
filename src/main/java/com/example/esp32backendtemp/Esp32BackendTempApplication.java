@@ -10,5 +10,4 @@ public class Esp32BackendTempApplication {
 		SpringApplication.run(Esp32BackendTempApplication.class, args);
 	}
 
-
 }
