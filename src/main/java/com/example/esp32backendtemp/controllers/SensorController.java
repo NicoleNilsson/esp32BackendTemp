@@ -15,7 +15,6 @@ public class SensorController {
 
     private final SensorRepo sensorRepo;
 
-
     public SensorController(SensorRepo sensorRepo) {
         this.sensorRepo = sensorRepo;
     }
