@@ -7,7 +7,7 @@
 
 SimpleDHT11 dht;
 HTTPClient http;
-const long SENSOR_ID = 1;
+const long SENSOR_ID = 2;
 
 void setup() {
     delay(2000);
@@ -32,7 +32,7 @@ float getTemperature() {
 }
 
 void jsonPayload(float temp, char* payload, size_t payloadSize) {
-    snprintf(payload, payloadSize, "temp:%.2f:sensorid:%ld", temp, SENSOR_ID);
+    snprintf(payload, payloadSize, "{\"temp\": %.2f, \"sensorId\": %u}", temp, SENSOR_ID);
 }
 
 bool sendTemperature(float temp) {
@@ -41,9 +41,10 @@ bool sendTemperature(float temp) {
     }
 
     http.begin(servername);
-    http.addHeader("Content-Type", "text/plain");
-    char payload[32];
+    http.addHeader("Content-Type", "application/json");
+    char payload[64];
     jsonPayload(temp, payload, sizeof(payload));
+
     int httpResponseCode = http.POST((uint8_t*)payload, strlen(payload));
 
     http.end();

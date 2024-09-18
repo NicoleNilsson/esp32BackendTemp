@@ -30,7 +30,7 @@ public class MeasurementController {
     //http://localhost:8080/measurement/add
     //temp = 23, sensorid = 1
     @PostMapping("/add")
-    public String add4(@RequestBody MeasurementDTO data) {
+    public String add(@RequestBody MeasurementDTO data) {
         Sensor sensor = sensorRepo.findById(data.getSensorId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid sensor ID"));
 
