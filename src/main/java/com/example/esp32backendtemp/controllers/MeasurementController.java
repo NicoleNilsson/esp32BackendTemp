@@ -41,18 +41,6 @@ public class MeasurementController {
         return measurementRepo.findByMeasurementTimeBetween(startOfDay, endOfDay);
     }
 
-    //http://localhost:8080/measurement/getbysensoranddate/1/2024-09-18
-    @RequestMapping("/getbysensoranddate/{sensorId}/{date}")
-    public List<Measurement> getBySensorAndDate(@PathVariable Long sensorId, @PathVariable String date) {
-        LocalDate measurementDate = LocalDate.parse(date);
-
-        LocalDateTime startOfDay = measurementDate.atStartOfDay();
-        LocalDateTime endOfDay = measurementDate.atTime(LocalTime.MAX);
-
-        return measurementRepo.findBySensorIdAndMeasurementTimeBetween(sensorId, startOfDay, endOfDay);
-    }
-
-
     //http://localhost:8080/measurement/add
     //temp = 23, sensorid = 1
     @PostMapping("/add")
