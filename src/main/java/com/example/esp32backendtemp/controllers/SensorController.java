@@ -6,7 +6,6 @@ import com.example.esp32backendtemp.repositories.MeasurementRepo;
 import com.example.esp32backendtemp.repositories.SensorRepo;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
@@ -41,13 +40,13 @@ public class SensorController {
 
     //http://localhost:8080/sensor/getbyname/vardagsrum
     @RequestMapping("/getbyname/{name}")
-    public List<Sensor> getByName(@PathVariable String name) {
+    public Sensor getByName(@PathVariable String name) {
         return sensorRepo.findByName(name);
     }
 
-    //http://localhost:8080/sensor/add?name=
-    @RequestMapping("/add")
-    public String add(@RequestParam String name){
+    //http://localhost:8080/sensor/add/sovrum
+    @RequestMapping("/add/{name}")
+    public String add(@PathVariable String name){
         sensorRepo.save(new Sensor(name));
         return "sensor " + name + " added";
     }
