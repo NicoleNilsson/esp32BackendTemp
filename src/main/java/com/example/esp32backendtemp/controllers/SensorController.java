@@ -25,6 +25,19 @@ public class SensorController {
         return sensorRepo.findAll();
     }
 
+    //http://localhost:8080/sensor/getbyid/1
+    @RequestMapping("/getbyid/{id}")
+    public Sensor getById(@PathVariable Long id) {
+        return sensorRepo.findById(id).
+                orElseThrow(() -> new IllegalArgumentException("Invalid sensor ID"));
+    }
+
+    //http://localhost:8080/sensor/getbyname/vardagsrum
+    @RequestMapping("/getbyname/{name}")
+    public List<Sensor> getByName(@PathVariable String name) {
+        return sensorRepo.findByName(name);
+    }
+
     //http://localhost:8080/sensor/add?name=
     @RequestMapping("/add")
     public String add(@RequestParam String name){
