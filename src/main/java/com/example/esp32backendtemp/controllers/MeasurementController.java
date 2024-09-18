@@ -7,6 +7,9 @@ import com.example.esp32backendtemp.models.Sensor;
 import com.example.esp32backendtemp.repositories.SensorRepo;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -25,6 +28,17 @@ public class MeasurementController {
     @RequestMapping("/getall")
     public List<Measurement> getAll() {
         return measurementRepo.findAll();
+    }
+
+    //http://localhost:8080/measurement/getbydate/2024-09-17
+    @RequestMapping("/getbydate/{date}")
+    public List<Measurement> getByDate(@PathVariable String date) {
+        LocalDate measurementDate = LocalDate.parse(date);
+
+        LocalDateTime startOfDay = measurementDate.atStartOfDay();
+        LocalDateTime endOfDay = measurementDate.atTime(LocalTime.MAX);
+
+        return measurementRepo.findByMeasurementTimeBetween(startOfDay, endOfDay);
     }
 
     //http://localhost:8080/measurement/add
