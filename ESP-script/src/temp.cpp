@@ -3,39 +3,36 @@
 #include "serverCredentials.h"
 
 #define DHTPIN 14
-#define SENSOR_TYPE DHT11
+#define SENSOR_TYPE SimpleDHT11
 
-DHT dht(DHTPIN, SENSOR_TYPE);
+SimpleDHT11 dht;
 HTTPClient http;
 const long SENSOR_ID = 1;
 
 void setup() {
-    setupSensor(dht);
-    setupWifi();
+    delay(2000);
+    bool wifiConnected = setupWifi();
 }
 
 void loop() {
-    float t = getTemperature(dht);
+    float t = getTemperature();
     if (!isnan(t)) {
         sendTemperature(t);
     }
     delay(10000);
 }
 
-bool setupSensor(DHT &dht) {
-    dht.begin();
-    delay(2000);
-    return true;
+float getTemperature() {
+    byte temperature = 0;
+    uint8_t err = dht.read(DHTPIN, &temperature, NULL, NULL);
+    if (err != SimpleDHTErrSuccess) {
+        return NAN;
+    }
+    return static_cast<float>(temperature);
 }
 
-float getTemperature(DHT &dht) {
-    return dht.readTemperature();
-}
-
-String jsonPayload(float temp) {
-    char payload[50];
-    snprintf(payload, sizeof(payload), "temp:%.2f:sensorid:%ld", temp, SENSOR_ID);
-    return String(payload);
+void jsonPayload(float temp, char* payload, size_t payloadSize) {
+    snprintf(payload, payloadSize, "temp:%.2f:sensorid:%ld", temp, SENSOR_ID);
 }
 
 bool sendTemperature(float temp) {
@@ -45,8 +42,9 @@ bool sendTemperature(float temp) {
 
     http.begin(servername);
     http.addHeader("Content-Type", "text/plain");
-    String jsonPayloadMessage = jsonPayload(temp);
-    int httpResponseCode = http.POST(jsonPayloadMessage);
+    char payload[32];
+    jsonPayload(temp, payload, sizeof(payload));
+    int httpResponseCode = http.POST((uint8_t*)payload, strlen(payload));
 
     http.end();
     return (httpResponseCode == HTTP_CODE_OK);

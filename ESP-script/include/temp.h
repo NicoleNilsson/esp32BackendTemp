@@ -1,12 +1,11 @@
 #pragma once
 
 #include <Arduino.h>
-#include <DHT.h>
+#include <SimpleDHT.h>
 #include <HTTPClient.h>
 
 void setup();
 void loop();
-bool setupSensor(DHT &dht);
-float getTemperature(DHT &dht);
-String jsonPayload(float temp);
+float getTemperature();
+void jsonPayload(float temp, char* payload, size_t payloadSize);
 bool sendTemperature(float temp);

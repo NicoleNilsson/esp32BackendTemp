@@ -5,8 +5,8 @@
 #define CONNECTION_TIMEOUT (millis() - connectionStart > connectionTimeout)
 #define TOTAL_RETRIES 10
 
-const unsigned long connectionTimeout = 20000;
-int retries = 0;
+const uint16_t connectionTimeout = 20000;
+uint8_t retries = 0;
 
 bool setupWifi() {
     WiFi.begin(ssid, password);
