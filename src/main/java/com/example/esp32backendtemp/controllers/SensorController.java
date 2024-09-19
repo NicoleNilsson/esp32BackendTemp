@@ -4,14 +4,13 @@ import com.example.esp32backendtemp.models.Measurement;
 import com.example.esp32backendtemp.models.Sensor;
 import com.example.esp32backendtemp.repositories.MeasurementRepo;
 import com.example.esp32backendtemp.repositories.SensorRepo;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/sensor")
@@ -100,6 +99,18 @@ public class SensorController {
         sensorRepo.delete(sensor);
 
         return "sensor " + name + " deleted";
+    }
+
+    @PostMapping("/update")
+    public String update(@RequestBody Sensor sensor) {
+        Optional<Sensor> existingSensor = sensorRepo.findById(sensor.getId());
+
+        if (existingSensor.isPresent()) {
+            sensorRepo.save(sensor);
+            return "sensor " + sensor.getName() + " updated";
+        } else {
+            return "sensor with id " + sensor.getId() + " not found";
+        }
     }
 
 }
