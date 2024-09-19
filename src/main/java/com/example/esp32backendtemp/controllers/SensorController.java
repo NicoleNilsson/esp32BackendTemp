@@ -76,6 +76,19 @@ public class SensorController {
         return measurementRepo.findBySensorIdAndMeasurementTimeBetween(sensor.getId(), startOfDay, endOfDay);
     }
 
+    //http://localhost:8080/sensor/getbyname/sovrum/measurements/2024-09-18/2024-09-19
+    @RequestMapping("/getbyname/{name}/measurements/{startDate}/{endDate}")
+    public List<Measurement> getMeasurementsBySensorNameAndDateRange(@PathVariable String name,
+                                                                     @PathVariable String startDate,
+                                                                     @PathVariable String endDate) {
+        LocalDateTime startTime = LocalDate.parse(startDate).atStartOfDay();
+        LocalDateTime endTime = LocalDate.parse(endDate).atTime(LocalTime.MAX);
+
+        Sensor sensor = sensorRepo.findByName(name);
+
+        return measurementRepo.findBySensorIdAndMeasurementTimeBetween(sensor.getId(), startTime, endTime);
+    }
+
 
     //http://localhost:8080/sensor/delete/
     @RequestMapping("/delete/{id}")
