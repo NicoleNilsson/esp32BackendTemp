@@ -1,6 +1,7 @@
 package com.example.esp32backendtemp.controllers;
 
 import com.example.esp32backendtemp.DTOs.MeasurementDTO;
+import com.example.esp32backendtemp.exceptions.SensorNotFoundException;
 import com.example.esp32backendtemp.models.Measurement;
 import com.example.esp32backendtemp.repositories.MeasurementRepo;
 import com.example.esp32backendtemp.models.Sensor;
@@ -34,7 +35,6 @@ public class MeasurementController {
     @RequestMapping("/getbydate/{date}")
     public List<Measurement> getByDate(@PathVariable String date) {
         LocalDate measurementDate = LocalDate.parse(date);
-
         LocalDateTime startOfDay = measurementDate.atStartOfDay();
         LocalDateTime endOfDay = measurementDate.atTime(LocalTime.MAX);
 
@@ -46,10 +46,9 @@ public class MeasurementController {
     @PostMapping("/add")
     public String add(@RequestBody MeasurementDTO data) {
         Sensor sensor = sensorRepo.findById(data.getSensorId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid sensor ID"));
+                .orElseThrow(() -> new SensorNotFoundException(String.valueOf(data.getSensorId()), "ID"));
 
         Measurement measurement = new Measurement(data.getTemp(), sensor);
-
         sensor.addMeasurement(measurement);
         measurementRepo.save(measurement);
 
@@ -73,7 +72,7 @@ public class MeasurementController {
     @RequestMapping("/delete/{id}")
     public String delete(@PathVariable Long id) {
         Measurement measurement = measurementRepo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid sensor ID"));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid measurement ID"));
 
         measurementRepo.delete(measurement);
 
