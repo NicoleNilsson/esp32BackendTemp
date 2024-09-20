@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include <SimpleDHT.h>
 #include <HTTPClient.h>
+#include <WiFiServer.h>
 
 void setup();
 void loop();

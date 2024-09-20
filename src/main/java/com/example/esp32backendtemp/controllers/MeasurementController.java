@@ -5,8 +5,13 @@ import com.example.esp32backendtemp.models.Measurement;
 import com.example.esp32backendtemp.repositories.MeasurementRepo;
 import com.example.esp32backendtemp.models.Sensor;
 import com.example.esp32backendtemp.repositories.SensorRepo;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.util.List;
 
 @RestController
@@ -20,6 +25,12 @@ public class MeasurementController {
         this.measurementRepo = measurementRepo;
         this.sensorRepo = sensorRepo;
     }
+
+    @Value("${esp32.ip}")
+    private String espIp;
+
+    @Value("${esp32.port}")
+    private int espPort;
 
     //http://localhost:8080/measurement/getall
     @RequestMapping("/getall")
@@ -51,5 +62,24 @@ public class MeasurementController {
         measurementRepo.delete(measurement);
 
         return "measurement deleted";
+    }
+
+    @GetMapping("/getOnDemand")
+    public String getOnDemandTemperature() {
+
+        try (Socket socket = new Socket(espIp, espPort);
+             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+            out.println("GET_TEMP");
+
+            String response = in.readLine();
+            System.out.println("Response from ESP32: " + response);
+
+            return response;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error communicating with ESP32: " + e.getMessage();
+        }
     }
 }
