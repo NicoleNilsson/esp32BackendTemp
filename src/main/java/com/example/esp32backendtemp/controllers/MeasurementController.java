@@ -70,12 +70,22 @@ public class MeasurementController {
         try (Socket socket = new Socket(espIp, espPort);
              PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
-            out.println("GET_TEMP");
 
+            out.println("GET_TEMP");
             String response = in.readLine();
             System.out.println("Response from ESP32: " + response);
 
-            return response;
+            String[] parts = response.replace("{", "").replace("}", "").replace("\"", "").split(",");
+            float temp = Float.parseFloat(parts[0].split(":")[1].trim());
+            long sensorId = Long.parseLong(parts[1].split(":")[1].trim());
+
+            Sensor sensor = sensorRepo.findById(sensorId)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid sensor ID"));
+            Measurement measurement = new Measurement(temp, sensor);
+            sensor.addMeasurement(measurement);
+            measurementRepo.save(measurement);
+
+            return "Measurement added: " + response;
 
         } catch (Exception e) {
             e.printStackTrace();

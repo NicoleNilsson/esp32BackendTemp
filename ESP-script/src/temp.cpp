@@ -5,11 +5,15 @@
 #define DHTPIN 14
 #define SENSOR_TYPE SimpleDHT11
 #define SERVER_PORT 12345
+#define TIMEOUT_INTERVAL 60000
 
 SimpleDHT11 dht;
 HTTPClient http;
 WiFiServer tcpServer(SERVER_PORT);
 const long SENSOR_ID = 152;
+
+unsigned long lastPingTime = 0;
+bool pingReceived = false;
 
 void setup() {
     Serial.begin(115200);
@@ -37,6 +41,8 @@ void loop() {
                 char c = client.read();
                 if (c == '\n') {
                     Serial.println("Received request: " + currentLine);
+                    lastPingTime = millis();
+                    pingReceived = true;
                     
                     if (currentLine.startsWith("GET_TEMP")) {
                         float temperature = getTemperature();
@@ -59,6 +65,14 @@ void loop() {
         }
         client.stop();
         Serial.println("Client Disconnected");
+    }
+
+    if (millis() - lastPingTime >= TIMEOUT_INTERVAL) {
+        float temp = getTemperature();
+        if (!isnan(temp)) {
+            sendTemperature(temp);
+        }
+        lastPingTime = millis();
     }
 }
 
