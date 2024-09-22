@@ -72,7 +72,12 @@ public class MeasurementController {
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
             out.println("GET_TEMP");
+            System.out.println("Sent GET_TEMP to ESP32");
+
             String response = in.readLine();
+            if (response == null || response.isEmpty()) {
+                return "No response received from ESP32.";
+            }
             System.out.println("Response from ESP32: " + response);
 
             String[] parts = response.replace("{", "").replace("}", "").replace("\"", "").split(",");
