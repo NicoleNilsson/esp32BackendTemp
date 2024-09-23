@@ -31,10 +31,10 @@ public class SensorController {
     }
 
     //http://localhost:8080/sensor/getbyid/1
-    @RequestMapping("/getbyid/{id}")
-    public Sensor getById(@PathVariable Long id) {
-        return sensorRepo.findById(id).
-                orElseThrow(() -> new SensorNotFoundException(String.valueOf(id), "ID"));
+    @RequestMapping("/getbyid/{sensorId}")
+    public Sensor getById(@PathVariable Long sensorId) {
+        return sensorRepo.findById(sensorId).
+                orElseThrow(() -> new SensorNotFoundException(String.valueOf(sensorId), "ID"));
     }
 
     //http://localhost:8080/sensor/getbyname/vardagsrum
@@ -53,14 +53,14 @@ public class SensorController {
     }
 
     //http://localhost:8080/sensor/getbyid/1/measurements/2024-09-18
-    @RequestMapping("/getbyid/{id}/measurements/{date}")
-    public List<Measurement> getMeasurementsBySensorIdAndDate(@PathVariable Long id, @PathVariable String date) {
+    @RequestMapping("/getbyid/{sensorId}/measurements/{date}")
+    public List<Measurement> getMeasurementsBySensorIdAndDate(@PathVariable Long sensorId, @PathVariable String date) {
         LocalDate measurementDate = LocalDate.parse(date);
         LocalDateTime startOfDay = measurementDate.atStartOfDay();
         LocalDateTime endOfDay = measurementDate.atTime(LocalTime.MAX);
 
-        Sensor sensor = sensorRepo.findById(id)
-                .orElseThrow(() -> new SensorNotFoundException(String.valueOf(id), "ID"));
+        Sensor sensor = sensorRepo.findById(sensorId)
+                .orElseThrow(() -> new SensorNotFoundException(String.valueOf(sensorId), "ID"));
 
         return measurementRepo.findBySensorIdAndMeasurementTimeBetween(sensor.getId(), startOfDay, endOfDay);
     }
@@ -96,10 +96,10 @@ public class SensorController {
     }
 
     //http://localhost:8080/sensor/delete/
-    @RequestMapping("/delete/{id}")
-    public String delete(@PathVariable Long id) {
-        Sensor sensor = sensorRepo.findById(id)
-                .orElseThrow(() -> new SensorNotFoundException(String.valueOf(id), "ID"));
+    @RequestMapping("/delete/{sensorId}")
+    public String delete(@PathVariable Long sensorId) {
+        Sensor sensor = sensorRepo.findById(sensorId)
+                .orElseThrow(() -> new SensorNotFoundException(String.valueOf(sensorId), "ID"));
 
         String name = sensor.getName();
         sensorRepo.delete(sensor);

@@ -55,19 +55,6 @@ public class MeasurementController {
         return "measurement added to sensor " + sensor.getName();
     }
 
-//    //temp method for easy add from webbrowser
-//    //http://localhost:8080/measurement/add2/1/23
-//    @RequestMapping("/add2/{sensorName}/{temp}")
-//    public String add2(@PathVariable String sensorName, @PathVariable float temp) {
-//        Sensor sensor = sensorRepo.findByName(name);
-//        Measurement measurement = new Measurement(temp, sensor);
-//
-//        sensor.addMeasurement(measurement);
-//        measurementRepo.save(measurement);
-//
-//        return "measurement added to sensor " + sensor.getName();
-//    }
-
     //http://localhost:8080/measurement/delete/
     @RequestMapping("/delete/{id}")
     public String delete(@PathVariable Long id) {
