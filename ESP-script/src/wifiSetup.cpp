@@ -9,6 +9,9 @@ const uint16_t connectionTimeout = 20000;
 uint8_t retries = 0;
 
 bool setupWifi() {
+    if (!WiFi.config(local_IP, gateway, subnet)) {
+        return false;
+    }
     WiFi.begin(ssid, password);
     return hasConnection();
 }
