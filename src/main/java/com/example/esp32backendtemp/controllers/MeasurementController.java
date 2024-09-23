@@ -41,8 +41,6 @@ public class MeasurementController {
         return measurementRepo.findByMeasurementTimeBetween(startOfDay, endOfDay);
     }
 
-    //http://localhost:8080/measurement/add
-    //temp = 23, sensorid = 1
     @PostMapping("/add")
     public String add(@RequestBody MeasurementDTO data) {
         Sensor sensor = sensorRepo.findById(data.getSensorId())
@@ -56,9 +54,9 @@ public class MeasurementController {
     }
 
     //http://localhost:8080/measurement/delete/
-    @RequestMapping("/delete/{id}")
-    public String delete(@PathVariable Long id) {
-        Measurement measurement = measurementRepo.findById(id)
+    @RequestMapping("/delete/{measurementId}")
+    public String delete(@PathVariable Long measurementId) {
+        Measurement measurement = measurementRepo.findById(measurementId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid measurement ID"));
 
         measurementRepo.delete(measurement);
