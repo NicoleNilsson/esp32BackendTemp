@@ -10,7 +10,7 @@
 SimpleDHT11 dht;
 HTTPClient http;
 WiFiServer tcpServer(SERVER_PORT);
-const long SENSOR_ID = 152;
+const long SENSOR_ID = 202;
 
 unsigned long lastPingTime = 0;
 bool pingReceived = false;
