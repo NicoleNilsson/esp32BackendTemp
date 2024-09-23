@@ -1,22 +1,27 @@
 package com.example.esp32backendtemp.controllers;
 
+import com.example.esp32backendtemp.models.Measurement;
 import com.example.esp32backendtemp.models.Sensor;
+import com.example.esp32backendtemp.repositories.MeasurementRepo;
 import com.example.esp32backendtemp.repositories.SensorRepo;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/sensor")
 public class SensorController {
 
     private final SensorRepo sensorRepo;
+    private final MeasurementRepo measurementRepo;
 
-    public SensorController(SensorRepo sensorRepo) {
+    public SensorController(SensorRepo sensorRepo, MeasurementRepo measurementRepo) {
         this.sensorRepo = sensorRepo;
+        this.measurementRepo = measurementRepo;
     }
 
     //http://localhost:8080/sensor/getall
@@ -34,16 +39,55 @@ public class SensorController {
 
     //http://localhost:8080/sensor/getbyname/vardagsrum
     @RequestMapping("/getbyname/{name}")
-    public List<Sensor> getByName(@PathVariable String name) {
+    public Sensor getByName(@PathVariable String name) {
         return sensorRepo.findByName(name);
     }
 
-    //http://localhost:8080/sensor/add?name=
-    @RequestMapping("/add")
-    public String add(@RequestParam String name){
+    //http://localhost:8080/sensor/add/sovrum
+    @RequestMapping("/add/{name}")
+    public String add(@PathVariable String name){
         sensorRepo.save(new Sensor(name));
         return "sensor " + name + " added";
     }
+
+    //http://localhost:8080/sensor/getbyid/1/measurements/2024-09-18
+    @RequestMapping("/getbyid/{sensorId}/measurements/{date}")
+    public List<Measurement> getMeasurementsBySensorIdAndDate(@PathVariable Long sensorId, @PathVariable String date) {
+        LocalDate measurementDate = LocalDate.parse(date);
+        LocalDateTime startOfDay = measurementDate.atStartOfDay();
+        LocalDateTime endOfDay = measurementDate.atTime(LocalTime.MAX);
+
+        Sensor sensor = sensorRepo.findById(sensorId)
+                .orElseThrow(() -> new RuntimeException("Sensor not found"));
+
+        return measurementRepo.findBySensorIdAndMeasurementTimeBetween(sensor.getId(), startOfDay, endOfDay);
+    }
+
+    //http://localhost:8080/sensor/getbyname/vardagsrum/measurements/2024-09-18
+    @RequestMapping("/getbyname/{name}/measurements/{date}")
+    public List<Measurement> getMeasurementsBySensorNameAndDate(@PathVariable String name, @PathVariable String date) {
+        LocalDate measurementDate = LocalDate.parse(date);
+        LocalDateTime startOfDay = measurementDate.atStartOfDay();
+        LocalDateTime endOfDay = measurementDate.atTime(LocalTime.MAX);
+
+        Sensor sensor = sensorRepo.findByName(name);
+
+        return measurementRepo.findBySensorIdAndMeasurementTimeBetween(sensor.getId(), startOfDay, endOfDay);
+    }
+
+    //http://localhost:8080/sensor/getbyname/sovrum/measurements/2024-09-18/2024-09-19
+    @RequestMapping("/getbyname/{name}/measurements/{startDate}/{endDate}")
+    public List<Measurement> getMeasurementsBySensorNameAndDateRange(@PathVariable String name,
+                                                                     @PathVariable String startDate,
+                                                                     @PathVariable String endDate) {
+        LocalDateTime startTime = LocalDate.parse(startDate).atStartOfDay();
+        LocalDateTime endTime = LocalDate.parse(endDate).atTime(LocalTime.MAX);
+
+        Sensor sensor = sensorRepo.findByName(name);
+
+        return measurementRepo.findBySensorIdAndMeasurementTimeBetween(sensor.getId(), startTime, endTime);
+    }
+
 
     //http://localhost:8080/sensor/delete/
     @RequestMapping("/delete/{id}")
@@ -55,6 +99,18 @@ public class SensorController {
         sensorRepo.delete(sensor);
 
         return "sensor " + name + " deleted";
+    }
+
+    @PostMapping("/update")
+    public String update(@RequestBody Sensor sensor) {
+        Optional<Sensor> existingSensor = sensorRepo.findById(sensor.getId());
+
+        if (existingSensor.isPresent()) {
+            sensorRepo.save(sensor);
+            return "sensor " + sensor.getName() + " updated";
+        } else {
+            return "sensor with id " + sensor.getId() + " not found";
+        }
     }
 
 }

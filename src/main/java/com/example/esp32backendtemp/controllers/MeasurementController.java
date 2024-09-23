@@ -8,10 +8,14 @@ import com.example.esp32backendtemp.repositories.SensorRepo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -38,6 +42,17 @@ public class MeasurementController {
         return measurementRepo.findAll();
     }
 
+    //http://localhost:8080/measurement/getbydate/2024-09-17
+    @RequestMapping("/getbydate/{date}")
+    public List<Measurement> getByDate(@PathVariable String date) {
+        LocalDate measurementDate = LocalDate.parse(date);
+
+        LocalDateTime startOfDay = measurementDate.atStartOfDay();
+        LocalDateTime endOfDay = measurementDate.atTime(LocalTime.MAX);
+
+        return measurementRepo.findByMeasurementTimeBetween(startOfDay, endOfDay);
+    }
+
     //http://localhost:8080/measurement/add
     //temp = 23, sensorid = 1
     @PostMapping("/add")
@@ -52,6 +67,19 @@ public class MeasurementController {
 
         return "measurement added to sensor " + sensor.getName();
     }
+
+//    //temp method for easy add from webbrowser
+//    //http://localhost:8080/measurement/add2/1/23
+//    @RequestMapping("/add2/{sensorName}/{temp}")
+//    public String add2(@PathVariable String sensorName, @PathVariable float temp) {
+//        Sensor sensor = sensorRepo.findByName(name);
+//        Measurement measurement = new Measurement(temp, sensor);
+//
+//        sensor.addMeasurement(measurement);
+//        measurementRepo.save(measurement);
+//
+//        return "measurement added to sensor " + sensor.getName();
+//    }
 
     //http://localhost:8080/measurement/delete/
     @RequestMapping("/delete/{id}")
