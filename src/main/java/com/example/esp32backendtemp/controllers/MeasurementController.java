@@ -1,6 +1,7 @@
 package com.example.esp32backendtemp.controllers;
 
 import com.example.esp32backendtemp.DTOs.MeasurementDTO;
+import com.example.esp32backendtemp.exceptions.SensorNotFoundException;
 import com.example.esp32backendtemp.models.Measurement;
 import com.example.esp32backendtemp.repositories.MeasurementRepo;
 import com.example.esp32backendtemp.models.Sensor;
@@ -46,46 +47,29 @@ public class MeasurementController {
     @RequestMapping("/getbydate/{date}")
     public List<Measurement> getByDate(@PathVariable String date) {
         LocalDate measurementDate = LocalDate.parse(date);
-
         LocalDateTime startOfDay = measurementDate.atStartOfDay();
         LocalDateTime endOfDay = measurementDate.atTime(LocalTime.MAX);
 
         return measurementRepo.findByMeasurementTimeBetween(startOfDay, endOfDay);
     }
 
-    //http://localhost:8080/measurement/add
-    //temp = 23, sensorid = 1
     @PostMapping("/add")
     public String add(@RequestBody MeasurementDTO data) {
         Sensor sensor = sensorRepo.findById(data.getSensorId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid sensor ID"));
+                .orElseThrow(() -> new SensorNotFoundException(String.valueOf(data.getSensorId()), "ID"));
 
         Measurement measurement = new Measurement(data.getTemp(), sensor);
-
         sensor.addMeasurement(measurement);
         measurementRepo.save(measurement);
 
         return "measurement added to sensor " + sensor.getName();
     }
 
-//    //temp method for easy add from webbrowser
-//    //http://localhost:8080/measurement/add2/1/23
-//    @RequestMapping("/add2/{sensorName}/{temp}")
-//    public String add2(@PathVariable String sensorName, @PathVariable float temp) {
-//        Sensor sensor = sensorRepo.findByName(name);
-//        Measurement measurement = new Measurement(temp, sensor);
-//
-//        sensor.addMeasurement(measurement);
-//        measurementRepo.save(measurement);
-//
-//        return "measurement added to sensor " + sensor.getName();
-//    }
-
     //http://localhost:8080/measurement/delete/
-    @RequestMapping("/delete/{id}")
-    public String delete(@PathVariable Long id) {
-        Measurement measurement = measurementRepo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid sensor ID"));
+    @RequestMapping("/delete/{measurementId}")
+    public String delete(@PathVariable Long measurementId) {
+        Measurement measurement = measurementRepo.findById(measurementId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid measurement ID"));
 
         measurementRepo.delete(measurement);
 
