@@ -66,7 +66,7 @@ public class MeasurementController {
     }
 
     //http://localhost:8080/measurement/delete/
-    @RequestMapping("/delete/{measurementId}")
+    @DeleteMapping("/delete/{measurementId}")
     public String delete(@PathVariable Long measurementId) {
         Measurement measurement = measurementRepo.findById(measurementId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid measurement ID"));

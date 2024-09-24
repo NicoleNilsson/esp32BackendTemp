@@ -45,11 +45,10 @@ public class SensorController {
         return sensorRepo.findByName(name);
     }
 
-    //http://localhost:8080/sensor/add/sovrum
-    @RequestMapping("/add/{name}")
-    public String add(@PathVariable String name){
-        sensorRepo.save(new Sensor(name));
-        return "sensor " + name + " added";
+    @PostMapping("/add")
+    public String add(@RequestBody Sensor sensor){
+        sensorRepo.save(sensor);
+        return "sensor " + sensor.getName() + " added";
     }
 
     //http://localhost:8080/sensor/getbyid/1/measurements/2024-09-18
@@ -107,7 +106,7 @@ public class SensorController {
         return "Sensor " + name + " deleted";
     }
 
-    @PostMapping("/update")
+    @PutMapping("/update")
     public String update(@RequestBody Sensor sensor) {
         Sensor existingSensor = sensorRepo.findById(sensor.getId())
                 .orElseThrow(() -> new SensorNotFoundException(String.valueOf(sensor.getId()), "ID"));
@@ -115,5 +114,4 @@ public class SensorController {
         sensorRepo.save(existingSensor);
         return "sensor " + existingSensor.getName() + " updated";
     }
-
 }
