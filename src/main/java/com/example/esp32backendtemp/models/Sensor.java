@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(name = "sensor", uniqueConstraints = {
+        @UniqueConstraint(name = "UK_sensor_name", columnNames = "name")
+})
 @Data
 @NoArgsConstructor
 public class Sensor {
@@ -16,11 +19,10 @@ public class Sensor {
     @GeneratedValue
     private Long id;
 
-    @Column(unique = true)
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "sensor_id")
+    @OneToMany(mappedBy = "sensor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Measurement> measurements = new ArrayList<>();
 
     public Sensor(String name) {
@@ -32,3 +34,4 @@ public class Sensor {
         this.measurements.add(measurement);
     }
 }
+

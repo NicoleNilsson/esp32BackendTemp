@@ -7,6 +7,7 @@ import com.example.esp32backendtemp.repositories.MeasurementRepo;
 import com.example.esp32backendtemp.models.Sensor;
 import com.example.esp32backendtemp.repositories.SensorRepo;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -107,6 +108,7 @@ public class MeasurementController {
         } catch (Exception e) {
             e.printStackTrace();
             return "Error communicating with ESP32: " + e.getMessage();
+            // Set offline in DB
         }
     }
 }
