@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Comparator;
 import java.util.List;
 
 @RestController
@@ -92,6 +93,24 @@ public class SensorController {
         if (sensor == null) {throw new SensorNotFoundException(name, "name");}
 
         return measurementRepo.findBySensorIdAndMeasurementTimeBetween(sensor.getId(), startTime, endTime);
+    }
+
+    //http://localhost:8080/sensor/getmaxtemp/kök/measurements/2024-09-23/2024-09-24
+    @RequestMapping("/getmaxtemp/{name}/measurements/{startDate}/{endDate}")
+    public Measurement getMaxTemperature(@PathVariable String name,
+                                                                     @PathVariable String startDate,
+                                                                     @PathVariable String endDate) {
+
+        LocalDateTime startTime = LocalDate.parse(startDate).atStartOfDay();
+        LocalDateTime endTime = LocalDate.parse(endDate).atTime(LocalTime.MAX);
+
+        Sensor sensor = sensorRepo.findByName(name);
+        if (sensor == null) {throw new SensorNotFoundException(name, "name");}
+
+        return measurementRepo.findBySensorIdAndMeasurementTimeBetween(sensor.getId(), startTime, endTime)
+                .stream()
+                .max(Comparator.comparingDouble(Measurement::getTemp))
+                .orElseThrow(() -> new RuntimeException("No measurements found in the given time range"));
     }
 
     //http://localhost:8080/sensor/delete/
