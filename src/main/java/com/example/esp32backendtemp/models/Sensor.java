@@ -8,23 +8,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(name = "sensor", uniqueConstraints = {
+        @UniqueConstraint(name = "UK_sensor_name", columnNames = "name")
+})
 @Data
 @NoArgsConstructor
 public class Sensor {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "sensor_id")
+    @Column(name = "status", nullable = false)
+    private boolean Status;
+
+    @OneToMany(mappedBy = "sensor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Measurement> measurements = new ArrayList<>();
 
     public Sensor(String name) {
         this.name = name;
+        this.Status = false;
     }
 
     public void addMeasurement(Measurement measurement) {
@@ -32,3 +38,4 @@ public class Sensor {
         this.measurements.add(measurement);
     }
 }
+

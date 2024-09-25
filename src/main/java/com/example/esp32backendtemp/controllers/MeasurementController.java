@@ -7,6 +7,7 @@ import com.example.esp32backendtemp.repositories.MeasurementRepo;
 import com.example.esp32backendtemp.models.Sensor;
 import com.example.esp32backendtemp.repositories.SensorRepo;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -62,6 +63,12 @@ public class MeasurementController {
         sensor.addMeasurement(measurement);
         measurementRepo.save(measurement);
 
+        if (!sensor.isStatus())
+        {
+            sensor.setStatus(true);
+            sensorRepo.save(sensor);
+        }
+
         return "measurement added to sensor " + sensor.getName();
     }
 
@@ -101,6 +108,12 @@ public class MeasurementController {
             Measurement measurement = new Measurement(temp, sensor);
             sensor.addMeasurement(measurement);
             measurementRepo.save(measurement);
+
+            if (!sensor.isStatus())
+            {
+                sensor.setStatus(true);
+                sensorRepo.save(sensor);
+            }
 
             return "Measurement added: " + response;
 
