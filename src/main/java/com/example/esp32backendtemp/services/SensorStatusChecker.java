@@ -18,16 +18,16 @@ public class SensorStatusChecker {
 	private final SensorRepo sensorRepo;
 	private final MeasurementRepo measurementRepo;
 
-	// Time interval after which the sensor should be marked as offline - 15min
-	private static final Duration OFFLINE_THRESHOLD = Duration.ofMinutes(15);
+	// Time interval after which the sensor should be marked as offline - 2min
+	private static final Duration OFFLINE_THRESHOLD = Duration.ofMinutes(2);
 
 	public SensorStatusChecker(SensorRepo sensorRepo, MeasurementRepo measurementRepo) {
 		this.sensorRepo = sensorRepo;
 		this.measurementRepo = measurementRepo;
 	}
 
-	// Runs every 5 minutes
-	@Scheduled(fixedRate = 5 * 60 * 1000)
+	// Runs every 2 minutes
+	@Scheduled(fixedRate = 2 * 60 * 1000)
 	@Transactional
 	public void checkSensorStatus() {
 		List<Sensor> sensors = sensorRepo.findAll();
