@@ -107,7 +107,7 @@ public class SensorController {
         return "Sensor " + name + " deleted";
     }
 
-    @PostMapping("/update")
+    @PutMapping("/update")
     public String update(@RequestBody Sensor sensor) {
         Sensor existingSensor = sensorRepo.findById(sensor.getId())
                 .orElseThrow(() -> new SensorNotFoundException(String.valueOf(sensor.getId()), "ID"));
@@ -115,5 +115,4 @@ public class SensorController {
         sensorRepo.save(existingSensor);
         return "sensor " + existingSensor.getName() + " updated";
     }
-
 }

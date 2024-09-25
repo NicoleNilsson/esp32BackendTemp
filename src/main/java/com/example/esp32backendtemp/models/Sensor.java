@@ -16,17 +16,21 @@ import java.util.List;
 public class Sensor {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
+
+    @Column(name = "status", nullable = false)
+    private boolean Status;
 
     @OneToMany(mappedBy = "sensor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Measurement> measurements = new ArrayList<>();
 
     public Sensor(String name) {
         this.name = name;
+        this.Status = false;
     }
 
     public void addMeasurement(Measurement measurement) {

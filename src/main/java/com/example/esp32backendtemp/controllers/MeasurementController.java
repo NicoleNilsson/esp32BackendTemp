@@ -103,12 +103,17 @@ public class MeasurementController {
             sensor.addMeasurement(measurement);
             measurementRepo.save(measurement);
 
+            if (!sensor.isStatus())
+            {
+                sensor.setStatus(true);
+                sensorRepo.save(sensor);
+            }
+
             return "Measurement added: " + response;
 
         } catch (Exception e) {
             e.printStackTrace();
             return "Error communicating with ESP32: " + e.getMessage();
-            // Set offline in DB
         }
     }
 }
