@@ -6,13 +6,13 @@ This project is an ESP32-based temperature monitoring system that collects tempe
 
 1.	ESP32 Integration:
 
-   •	The ESP32 collects temperature data using the DHT11 sensor.
+    •	The ESP32 collects temperature data using the DHT11 sensor.
 
-   •	The ESP32 handles client requests via TCP, sending the current temperature when requested.
+    •	The ESP32 handles client requests via TCP, sending the current temperature when requested.
 
-   •	Automatic temperature readings are sent periodically to the backend server.
+    •	Automatic temperature readings are sent periodically to the backend server.
 
-   •	Supports Wi-Fi connection and reconnection logic.
+    •	Supports Wi-Fi connection and reconnection logic.
 
 2.	Spring Boot Backend:
 	    
@@ -37,21 +37,21 @@ This project is an ESP32-based temperature monitoring system that collects tempe
 
 ESP32 Side
 
-  •	The ESP32 establishes a Wi-Fi connection using credentials provided in wifiSetup.h.
+   •	The ESP32 establishes a Wi-Fi connection using credentials provided in wifiSetup.h.
 
-  •	The TCP server on the ESP32 listens for incoming client connections.
+   •	The TCP server on the ESP32 listens for incoming client connections.
 
-  •	When a client sends a GET_TEMP request, the ESP32 reads the temperature from the DHT11 sensor and responds with a JSON object containing the temperature and the sensor ID.
+   •	When a client sends a GET_TEMP request, the ESP32 reads the temperature from the DHT11 sensor and responds with a JSON object containing the temperature and the sensor ID.
 
-  •	The ESP32 periodically sends temperature data to the backend server using HTTP POST requests.
+   •	The ESP32 periodically sends temperature data to the backend server using HTTP POST requests.
 
 Backend Side
 
-  •	The Spring Boot backend serves as the data manager for sensors and measurements.
+   •	The Spring Boot backend serves as the data manager for sensors and measurements.
 
-  •	When the /measurement/getOnDemand endpoint is hit, the backend establishes a TCP connection with the ESP32 to get the current temperature.
+   •	When the /measurement/getOnDemand endpoint is hit, the backend establishes a TCP connection with the ESP32 to get the current temperature.
 
-  •	All measurements are saved in the database, and users can retrieve them via REST APIs.
+   •	All measurements are saved in the database, and users can retrieve them via REST APIs.
 
 
 ## API Documentation
