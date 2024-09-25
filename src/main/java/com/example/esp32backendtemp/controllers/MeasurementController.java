@@ -63,6 +63,12 @@ public class MeasurementController {
         sensor.addMeasurement(measurement);
         measurementRepo.save(measurement);
 
+        if (!sensor.isStatus())
+        {
+            sensor.setStatus(true);
+            sensorRepo.save(sensor);
+        }
+
         return "measurement added to sensor " + sensor.getName();
     }
 
