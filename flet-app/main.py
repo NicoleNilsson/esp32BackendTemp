@@ -13,16 +13,17 @@ if not backend_url:
 
 def get_on_demand_temperature(page):
     try:
-        response = requests.get(backend_url)
+
+        response = requests.get(backend_url, timeout=10)
         response.raise_for_status()
-        
+
         data = response.text
         print("Response from server:", data)
 
         json_start_index = data.find("{")
         if json_start_index == -1:
             raise ValueError("Invalid response format: no JSON found")
-        
+
         json_data = data[json_start_index:]
         json_obj = json.loads(json_data)
         temp = json_obj.get("temp")
@@ -35,15 +36,16 @@ def get_on_demand_temperature(page):
             temperature_label.value = temperature
         else:
             error_label.value = "Invalid data received"
-        
+
         page.update()
 
     except (requests.exceptions.RequestException, ValueError) as e:
+        print(f"Error fetching data: {e}")
         error_label.value = f"Error fetching data: {e}"
         page.update()
 
 async def main(page: ft.Page):
-    global sensor_name_label, temperature_label, error_label, content_column
+    global sensor_name_label, temperature_label, error_label
     
     page.title = "Temperature Sensor"
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
@@ -60,49 +62,32 @@ async def main(page: ft.Page):
         on_click=lambda e: get_on_demand_temperature(page)
     )
 
-    content_column = ft.AnimatedSwitcher(
-        content=ft.Column(
-            [
-                sensor_name_label,
-                temperature_label,
-                get_button,
-                error_label
-            ],
-            alignment=ft.MainAxisAlignment.CENTER,
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-        ),
-        duration=500,
-    )
+    progress_bar = ft.ProgressBar(width=200)
     
-    page.add(welcome_text)
-    
+    page.add(welcome_text, progress_bar)
+    page.update()
+
     async def show_main_content():
         await asyncio.sleep(2)
-        
+
+
         welcome_text.opacity = 0
         welcome_text.update()
 
         await asyncio.sleep(1)
+
+        progress_bar.visible = False
+        page.update()
+
+        print("Showing sensor data and button...")
 
         sensor_name_label.opacity = 1
         temperature_label.opacity = 1
         get_button.opacity = 1
         error_label.opacity = 1
 
-        content_column.content = ft.Column(
-            [
-                sensor_name_label,
-                temperature_label,
-                get_button,
-                error_label
-            ],
-            alignment=ft.MainAxisAlignment.CENTER,
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-        )
+        page.add(sensor_name_label, temperature_label, get_button, error_label)
         page.update()
-
-    page.add(ft.ProgressBar(width=200))
-    page.update()
 
     await show_main_content()
 
